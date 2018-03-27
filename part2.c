@@ -43,7 +43,7 @@ int loop(int argc, char *argv[], char **envp){
                 	scanf("%d",&app);
 			if (app<1||app>5){
 				printf("\n Invalid input, try again");
-				exit(EXIT_FAILURE);
+				status = 1;
 			}	
 				
 			if (app == 4){

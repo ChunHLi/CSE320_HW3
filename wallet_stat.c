@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#inlcude <time.h>
+#include <time.h>
+#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <errno.h>
 
 struct wallets {
     uint32_t key;
@@ -25,9 +29,8 @@ uint32_t money_gen() {
     return money;
 }
 
-void generate_wallets(struct wallets* wallet) {
+void generate_wallets(int num_wallets, struct wallets* wallet) {
     int i = 0;
-    int num_wallets = 5000000;
     for (i; i < num_wallets; ++i) {
         wallet[i].key = key_gen();
         wallet[i].money = money_gen();
@@ -37,7 +40,7 @@ void generate_wallets(struct wallets* wallet) {
 void print_wallets(FILE* fp, int num_wallets, struct wallets* wallet) {
     int i = 0;
     for (i; i < num_wallets; ++i)
-        fprintf(fp, "wallet: %x; money: %d\n", wallet[i].key, wallet[i].key);
+        fprintf(fp, "wallet: %x; money: %d\n", wallet[i].key, wallet[i].money);
 }
 
 int main(void) {
@@ -53,7 +56,7 @@ int main(void) {
     pid_t pid;
 
     printf("Please enter the file name that contains number of wallets: ");
-    fscanf("%s", filename);
+    scanf("%s", filename);
     fp = fopen(filename, "r");
     fscanf(fp, "%d", &num_wallets);
     struct wallets* wallet = (struct wallets*)malloc(num_wallets * sizeof(struct wallets));
@@ -61,10 +64,12 @@ int main(void) {
     printf("Type 'help' for list of available commands.\n");
 prompt:
     printf("prompt> ");
-    fscanf("%s", command);
+    scanf("%s", command);
     if (strcmp(command, "help") == 0) {
         if ((pid = fork()) == 0) {
-            execvp("./print_help", NULL);
+	    char *args[]={"./print_help",NULL};
+            execvp(args[0], args);
+		printf("exec failed: %s\n",strerror(errno));
             exit(0);
         }
         sleep(1);
@@ -73,25 +78,32 @@ prompt:
     else if (strcmp(command, "generate") == 0) {
         if (!is_generated) {
             is_generated = 1;
-            generate_wallets(wallet);
+            generate_wallets(num_wallets,wallet);
         }
         else
             printf("Wallets are already generated.\n");
         goto prompt;
     }
     else if (strcmp(command, "print") == 0) {
-        if (!is_printed) {
+        if (!is_printed && is_generated) {
             is_printed = 1;
             filename = "wallets_info.dat";
             fp = fopen(filename, "w");
             print_wallets(fp, num_wallets, wallet);
         }
-        else
+        else if (!is_generated){
+		printf("Wallet have yet to be generated.\n");
+	} 
+	else {
             printf("Wallets are already printed.\n");
-        goto prompt;
+        }
+	goto prompt;
     }
-    else if (strcmp(command, "quit") == 0)
-        return 0;
+    else if (strcmp(command, "quit") == 0){
+	free(filename);
+        free(command);
+	return 0;
+    }
     else {
         printf("Unknown command.\n");
         goto prompt;
