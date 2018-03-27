@@ -39,12 +39,17 @@ int loop(int argc, char *argv[], char **envp){
                         	}
                 	}
 			fclose(fr);
-			printf("> Available applications:\n> 1) solver\n> 2) trace\n> 3) fib\n> 4) change input file name\n> 5) quit\n> Enter application number: ");
-                	scanf("%d",&app);
-			if (app<1||app>5){
-				printf("\n Invalid input, try again");
-				status = 1;
-			}	
+			char* tmp;
+			do {
+				printf("> Available applications:\n> 1) solver\n> 2) trace\n> 3) fib\n> 4) change input file name\n> 5) quit\n> Enter application number: ");
+				scanf("%s",tmp);
+				app = atoi(tmp);
+				if (app >= 1 && app <= 5){
+					break;
+				} else {
+                                	printf("\nInvalid input, try again\n"); 
+				}
+			} while (app<1 || app>5);	
 				
 			if (app == 4){
 				printf("Enter new input file name: ");
@@ -80,7 +85,7 @@ int loop(int argc, char *argv[], char **envp){
 				status = 1;
 			}
                         
-        	}
+		}
 	} while (status);
         return 1;
 }
