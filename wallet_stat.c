@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/wait.h>
 
 struct wallets {
     uint32_t key;
@@ -53,11 +54,16 @@ int main(void) {
     int num_wallets;
     int is_generated = 0;
     int is_printed = 0;
-    pid_t pid;
+    pid_t pid, wpid;
+    int status;
 
     printf("Please enter the file name that contains number of wallets: ");
     scanf("%s", filename);
     fp = fopen(filename, "r");
+    if (!fp) {
+	printf("FILE DOES NOT EXIST");
+	return 0;
+    }
     fscanf(fp, "%d", &num_wallets);
     struct wallets* wallet = (struct wallets*)malloc(num_wallets * sizeof(struct wallets));
 
@@ -71,7 +77,11 @@ prompt:
             execvp(args[0], args);
 		printf("exec failed: %s\n",strerror(errno));
             exit(0);
-        }
+        } else {
+		do {
+			wpid = waitpid(pid, &status, WUNTRACED);
+		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+	}
         sleep(1);
         goto prompt;
     }

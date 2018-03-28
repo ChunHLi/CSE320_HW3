@@ -2,12 +2,15 @@ line 4: mispelled include
 line 31: number of wallets generated was set to a constant rather than the number within the read file
 line 43: prints the wallet key twice instead of money
 line 59: wrong function: scanf instead of fscanf
+line 62: checked if file does not exist
 line 67: wrong function: scanf instead of fscanf
 forgot to include string.h
 forgot to include sys/types.h
 forgot to include unistd.h
 line 71: execvp requires non null arguments. Even if print_help requires no additional arguments, you still need to pass the proper array of arguments.	
-line 79: fixed generate call to include correct number of parameters
-line 85: wallets could be printed before being generated resulting in wallets with ids and values of 0
+line 80: child processes weren't terminated, could cause zombies
+line 91: fixed generate call to include correct number of parameters
+line 104: wallets could be printed before being generated resulting in wallets with ids and values of 0
+line 113: deallocated pointers
 
 print_help.o needed to be compiled into an executable file for execvp to run.	

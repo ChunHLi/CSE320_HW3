@@ -16,7 +16,7 @@ int loop(int argc, char *argv[], char **envp){
 	char *args[255];
 	do {
 		if (argc != 2){
-                	perror("INVALID NUMBER OF ARGUMENTS\n");
+                	printf("INVALID NUMBER OF ARGUMENTS\n");
                 	return (-1);
         	} else {
 			FILE *fr = fopen(argv[1],"r");
@@ -91,5 +91,5 @@ int loop(int argc, char *argv[], char **envp){
 }
 int main(int argc, char *argv[], char** envp){
         loop(argc,argv,envp);
-	return EXIT_SUCCESS;
+	return 1;
 }
